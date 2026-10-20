@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thí Sinh Dự Thi Đại Học</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .section h3 {
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #555;
+        }
+        input, select {
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary { background-color: #1a73e8; color: white; }
+        .btn-primary:hover { background-color: #1557b0; }
+        .btn-search { background-color: #27ae60; color: white; }
+        .btn-search:hover { background-color: #219150; }
+        .btn-reset { background-color: #7f8c8d; color: white; }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+        tr:hover { background-color: #f1f1f1; }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-a { background-color: #e74c3c; }
+        .badge-b { background-color: #2980b9; }
+        .badge-c { background-color: #8e44ad; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Hệ Thống Quản Lý Thí Sinh Tuyên Sinh</h1>
+
+    <!-- Form Thêm Thí Sinh -->
+    <div class="section">
+        <h3>1. Thêm Mới Thí Sinh</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Số báo danh:</label>
+                <input type="text" id="sbd" placeholder="VD: TS01...">
+            </div>
+            <div class="form-group">
+                <label>Họ và tên:</label>
+                <input type="text" id="hoTen" placeholder="VD: Nguyễn Văn A...">
+            </div>
+            <div class="form-group">
+                <label>Địa chỉ:</label>
+                <input type="text" id="diaChi" placeholder="VD: Hải Phòng...">
+            </div>
+            <div class="form-group">
+                <label>Mức ưu tiên:</label>
+                <input type="number" id="uuTien" value="0" min="0">
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Khối thi:</label>
+                <select id="khoiThi">
+                    <option value="A">Khối A (Toán, Lý, Hoá)</option>
+                    <option value="B">Khối B (Toán, Hoá, Sinh)</option>
+                    <option value="C">Khối C (Văn, Sử, Địa)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="themMoiThiSinh()">Thêm Thí Sinh</button>
+    </div>
+
+    <!-- Khung Tìm Kiếm -->
+    <div class="section">
+        <h3>2. Tìm Kiếm Theo Số Báo Danh</h3>
+        <div class="search-box">
+            <input type="text" id="txtTimKiem" placeholder="Nhập Số báo danh cần tìm..." style="flex: 1;">
+            <button class="btn btn-search" onclick="timKiemSBD()">Tìm Kiếm</button>
+            <button class="btn btn-reset" onclick="hienThiDanhSach(danhSach)">Tất Cả</button>
+        </div>
+    </div>
+
+    <!-- Bảng Danh Sách -->
+    <h3>Danh Sách Thí Sinh Dự Thi</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SBD</th>
+                <th>Họ Tên</th>
+                <th>Địa Chỉ</th>
+                <th>Ưu Tiên</th>
+                <th>Khối Thi</th>
+                <th>Các Môn Thi</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Dữ liệu render ra đây -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Khởi tạo danh sách mẫu sẵn
+    let danhSach = [
+        { sbd: "TS01", hoTen: "Nguyễn Văn An", diaChi: "Hà Nội", uuTien: 1, khoi: "A", monThi: "Toán, Lý, Hoá" },
+        { sbd: "TS02", hoTen: "Trần Thị Bình", diaChi: "Hải Phòng", uuTien: 2, khoi: "B", monThi: "Toán, Hoá, Sinh" },
+        { sbd: "TS03", hoTen: "Lê Văn Cường", diaChi: "Đà Nẵng", uuTien: 0, khoi: "C", monThi: "Văn, Sử, Địa" }
+    ];
+
+    function renderTable(list) {
+        let tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        if(list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Không tìm thấy thí sinh nào!</td></tr>`;
+            return;
+        }
+
+        list.forEach(ts => {
+            let badgeClass = ts.khoi === 'A' ? 'badge-a' : (ts.khoi === 'B' ? 'badge-b' : 'badge-c');
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><b>${ts.sbd}</b></td>
+                <td>${ts.hoTen}</td>
+                <td>${ts.diaChi}</td>
+                <td>${ts.uuTien}</td>
+                <td><span class="badge ${badgeClass}">Khối ${ts.khoi}</span></td>
+                <td>${ts.monThi}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function hienThiDanhSach(list) {
+        document.getElementById("txtTimKiem").value = "";
+        renderTable(list);
+    }
+
+    function themMoiThiSinh() {
+        let sbd = document.getElementById("sbd").value.trim();
+        let hoTen = document.getElementById("hoTen").value.trim();
+        let diaChi = document.getElementById("diaChi").value.trim();
+        let uuTien = document.getElementById("uuTien").value;
+        let khoi = document.getElementById("khoiThi").value;
+
+        if(!sbd || !hoTen || !diaChi) {
+            alert("Vui lòng điền đầy đủ thông tin thí sinh!");
+            return;
+        }
+
+        let monThi = "";
+        if(khoi === "A") monThi = "Toán, Lý, Hoá";
+        else if(khoi === "B") monThi = "Toán, Hoá, Sinh";
+        else if(khoi === "C") monThi = "Văn, Sử, Địa";
+
+        danhSach.push({ sbd, hoTen, diaChi, uuTien, khoi, monThi });
+        hienThiDanhSach(danhSach);
+
+        // Reset form
+        document.getElementById("sbd").value = "";
+        document.getElementById("hoTen").value = "";
+        document.getElementById("diaChi").value = "";
+        document.getElementById("uuTien").value = "0";
+    }
+
+    function timKiemSBD() {
+        let keyword = document.getElementById("txtTimKiem").value.trim().toLowerCase();
+        if(!keyword) {
+            alert("Vui lòng nhập SBD cần tìm!");
+            return;
+        }
+        let ketQua = danhSach.filter(ts => ts.sbd.toLowerCase().includes(keyword));
+        renderTable(ketQua);
+    }
+
+    // Tải bảng lần đầu
+    hienThiDanhSach(danhSach);
+</script>
+
+</body>
+</html>
